@@ -3,7 +3,8 @@ import co.edu.unicordoba.registro_visitantes.modelo.Visitante;
 import co.edu.unicordoba.registro_visitantes.servicio.VisitanteService;
 import co.edu.unicordoba.registro_visitantes.util.TextoUtil;
 import org.springframework.web.bind.annotation.*;
-
+import java.time.Instant;
+import java.net.InetAddress;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Map;
 @RequestMapping("/api/visitantes")
 public class VisitanteController {
     private final VisitanteService servicio;
-
+    private static final Instant ARRANQUE = Instant.now();
     // Inyección por constructor
     public VisitanteController(VisitanteService servicio) {
         this.servicio = servicio;
@@ -51,5 +52,14 @@ public class VisitanteController {
                 "registradosEnElServicio", servicio.contarRegistrados(),
                 "creadosEnLaClase", Visitante.getTotalCreados()
         );
+    }
+    @GetMapping("/instancia")
+    public Map<String, Object> instancia() throws Exception {
+        Map<String, Object> r = new LinkedHashMap<>();
+        r.put("host", InetAddress.getLocalHost().getHostName());
+        r.put("arranqueJvm", ARRANQUE.toString());
+        r.put("creados", Visitante.getTotalCreados());
+        r.put("registrados", servicio.contarRegistrados());
+        return r;
     }
 }
